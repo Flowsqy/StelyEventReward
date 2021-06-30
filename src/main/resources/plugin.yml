@@ -1,0 +1,4 @@
+name: StelyEventReward
+author: Flowsqy
+version: "${project.version}"
+main: fr.flowsqy.stelyeventreward.StelyEventRewardPlugin
