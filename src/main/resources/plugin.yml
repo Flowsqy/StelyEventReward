@@ -2,7 +2,7 @@ name: StelyEventReward
 author: Flowsqy
 version: "${project.version}"
 main: fr.flowsqy.stelyeventreward.StelyEventRewardPlugin
-api-version: 16
+api-version: "1.16"
 commands:
   seteventreward:
     permission: stelyeventreward.command.setreward
