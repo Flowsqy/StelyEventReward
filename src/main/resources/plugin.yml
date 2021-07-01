@@ -2,3 +2,16 @@ name: StelyEventReward
 author: Flowsqy
 version: "${project.version}"
 main: fr.flowsqy.stelyeventreward.StelyEventRewardPlugin
+commands:
+  seteventreward:
+    permission: stelyeventreward.command.setreward
+    description: Set a reward
+    aliases:
+      - ser
+    usage: /<command> <event> <rank>
+  eventreward:
+    permission: stelyeventreward.command.reward
+    description: Give a reward
+    aliases:
+      - er
+    usage: /<command> <event> <ranking> <pseudo>

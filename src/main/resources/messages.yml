@@ -1,0 +1,7 @@
+prefix: "&7[&5StelyEventReward&7]&f"
+
+util:
+  only-player: "%prefix% &cSeul un joueur peut effectuer la commande"
+
+give:
+  help: "%prefix% &6/seteventreward <event> <rank>"
