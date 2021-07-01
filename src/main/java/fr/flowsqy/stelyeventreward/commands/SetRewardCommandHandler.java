@@ -58,7 +58,9 @@ public class SetRewardCommandHandler implements TabExecutor {
     }
 
     private void helpExecutor(Player player, String[] args) {
-
+        for(SubCommand subCommand : subCommands){
+            messages.sendMessage(player, subCommand.getHelpPath());
+        }
     }
 
     private void editExecutor(Player player, String[] args) {
