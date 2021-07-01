@@ -41,14 +41,14 @@ public class SetRewardCommandHandler implements TabExecutor {
         subCommands[1] = new SubCommand(
                 "edit",
                 "e",
-                0,
+                1,
                 this::editExecutor,
                 (player, args) -> Collections.emptyList()
         );
         subCommands[2] = new SubCommand(
                 "save",
                 "s",
-                2,
+                3,
                 this::saveExecutor,
                 (player, args) -> Collections.emptyList()
         );
@@ -68,7 +68,7 @@ public class SetRewardCommandHandler implements TabExecutor {
     }
 
     private void editExecutor(Player player, String[] args) {
-        if (setSessionManager.close(player, session -> {
+        if (setSessionManager.close(player, () -> {
         })) {
             messages.sendMessage(player, "setreward.edit.close");
         } else {
@@ -78,7 +78,15 @@ public class SetRewardCommandHandler implements TabExecutor {
     }
 
     private void saveExecutor(Player player, String[] args) {
-
+        final String eventName = args[1];
+        final String ranking = args[2];
+        if (setSessionManager.close(player, () -> {
+            // TODO Save the session
+        })) {
+            messages.sendMessage(player, "setreward.save.success", "%event%", "%ranking%", eventName, ranking);
+        } else {
+            messages.sendMessage(player, "setreward.save.fail");
+        }
     }
 
     private void messageExecutor(Player player, String[] args) {

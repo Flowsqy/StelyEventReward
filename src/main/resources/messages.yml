@@ -12,3 +12,6 @@ setreward:
   edit:
     open: "%prefix% &6Tu rentres dans le mode édition"
     close: "%prefix% &6Tu sors du mode édition"
+  save:
+    success: "%prefix% &6Tu as sauvegardé la récompense du &a%ranking% &6pour l'event &a%event%"
+    fail: "%prefix% &cTu n'es pas en mode édition"

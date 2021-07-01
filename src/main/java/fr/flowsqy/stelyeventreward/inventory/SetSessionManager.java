@@ -25,7 +25,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class SetSessionManager implements Listener {
 
@@ -50,11 +49,11 @@ public class SetSessionManager implements Listener {
         moveProtectionTask.start();
     }
 
-    public boolean close(Player player, Consumer<SetSession> closeCallback) {
+    public boolean close(Player player, Runnable closeCallback) {
         final SetSession session = sessions.remove(player.getUniqueId());
         if (session == null)
             return false;
-        closeCallback.accept(session);
+        closeCallback.run();
         resetInventory(player, session);
         return true;
     }
@@ -133,7 +132,7 @@ public class SetSessionManager implements Listener {
         }
     }
 
-    public final record SetSession(
+    private final record SetSession(
             ItemStack[] originalContent,
             GameMode previousGameMode,
             MoveProtectionTask moveProtectionTask
