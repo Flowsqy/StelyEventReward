@@ -32,7 +32,7 @@ public class StelyEventRewardPlugin extends JavaPlugin {
         }
 
         this.messages = new Messages(initFile(dataFolder));
-        this.setSessionManager = new SetSessionManager(this, dataFolder);
+        this.setSessionManager = new SetSessionManager(this);
 
         new CommandManager(this);
     }

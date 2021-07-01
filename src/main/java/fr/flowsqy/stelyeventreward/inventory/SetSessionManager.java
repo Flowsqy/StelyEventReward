@@ -22,25 +22,24 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class SetSessionManager implements Listener {
 
     private final Map<UUID, SetSession> sessions;
-    private final File rewardFolder;
 
-    public SetSessionManager(StelyEventRewardPlugin plugin, File pluginDataFolder) {
+    public SetSessionManager(StelyEventRewardPlugin plugin) {
         sessions = new HashMap<>();
-        rewardFolder = new File(pluginDataFolder, "rewards");
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public boolean open(Player player) {
-        final boolean inSession = sessions.containsKey(player.getUniqueId());
-        if (!inSession) {
+    // Session manipulation
+
+    public void open(Player player) {
+        if (!sessions.containsKey(player.getUniqueId())) {
             final MoveProtectionTask moveProtectionTask = new MoveProtectionTask(player);
             sessions.put(player.getUniqueId(), new SetSession(
                     player.getInventory().getContents(),
@@ -51,14 +50,13 @@ public class SetSessionManager implements Listener {
             player.setGameMode(GameMode.CREATIVE);
             moveProtectionTask.start();
         }
-        return !inSession;
     }
 
-    public boolean close(Player player, String event, String ranking) {
+    public boolean close(Player player, Consumer<SetSession> closeCallback) {
         final SetSession session = sessions.remove(player.getUniqueId());
         if (session == null)
             return false;
-        // TODO Save in a config
+        closeCallback.accept(session);
         resetInventory(player, session);
         return true;
     }
@@ -69,6 +67,29 @@ public class SetSessionManager implements Listener {
         }
         sessions.clear();
     }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onDisconnect(PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        final SetSession session = sessions.remove(player.getUniqueId());
+        resetInventory(player, session);
+    }
+
+    private void resetInventory(Player player, SetSession session) {
+        if (session == null)
+            return;
+        final PlayerInventory inventory = player.getInventory();
+        inventory.clear();
+        inventory.setContents(session.originalContent());
+        player.setGameMode(session.previousGameMode());
+        session.moveProtectionTask().cancel();
+    }
+
+    private boolean fastCheckPlayer(UUID uuid) {
+        return !sessions.isEmpty() && sessions.containsKey(uuid);
+    }
+
+    // Protection
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerInteract(PlayerInteractEvent event) {
@@ -114,29 +135,11 @@ public class SetSessionManager implements Listener {
         }
     }
 
-    private boolean fastCheckPlayer(UUID uuid) {
-        return !sessions.isEmpty() && sessions.containsKey(uuid);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    private void onDisconnect(PlayerQuitEvent event) {
-        final Player player = event.getPlayer();
-        final SetSession session = sessions.remove(player.getUniqueId());
-        resetInventory(player, session);
-    }
-
-    private void resetInventory(Player player, SetSession session) {
-        if (session == null)
-            return;
-        final PlayerInventory inventory = player.getInventory();
-        inventory.clear();
-        inventory.setContents(session.originalContent());
-        player.setGameMode(session.previousGameMode());
-        session.moveProtectionTask().cancel();
-    }
-
-    private final record SetSession(ItemStack[] originalContent, GameMode previousGameMode,
-                                    MoveProtectionTask moveProtectionTask) {
+    public final record SetSession(
+            ItemStack[] originalContent,
+            GameMode previousGameMode,
+            MoveProtectionTask moveProtectionTask
+    ) {
     }
 
     private final static class MoveProtectionTask extends BukkitRunnable {
