@@ -8,7 +8,7 @@ commands:
     description: Set a reward
     aliases:
       - ser
-    usage: /<command> <event> <rank>
+    usage: /<command> <subCommand>
   eventreward:
     permission: stelyeventreward.command.reward
     description: Give a reward

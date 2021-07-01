@@ -41,6 +41,7 @@ public class SetSessionManager implements Listener {
         for (Map.Entry<UUID, ItemStack[]> entry : sessions.entrySet()) {
             resetInventory(Bukkit.getPlayer(entry.getKey()), entry.getValue());
         }
+        sessions.clear();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -61,6 +62,5 @@ public class SetSessionManager implements Listener {
         inventory.clear();
         inventory.setContents(originalContent);
     }
-
 
 }

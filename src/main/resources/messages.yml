@@ -3,5 +3,9 @@ prefix: "&7[&5StelyEventReward&7]&f"
 util:
   only-player: "%prefix% &cSeul un joueur peut effectuer la commande"
 
-give:
-  help: "%prefix% &6/seteventreward <event> <rank>"
+setreward:
+  help:
+    help: "%prefix% &6/seteventreward help"
+    edit: "%prefix% &6/seteventreward edit"
+    save: "%prefix% &6/seteventreward save <event> <rank>"
+    message: "%prefix% &6/seteventreward message <message>"
