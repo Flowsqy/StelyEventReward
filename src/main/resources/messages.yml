@@ -9,5 +9,6 @@ setreward:
     edit: "%prefix% &6/seteventreward edit"
     save: "%prefix% &6/seteventreward save <event> <rank>"
     message: "%prefix% &6/seteventreward message <message>"
-  edit: "%prefix% &6Tu rentres dans le mode édition"
-  alreadyedit: "%prefix% &cTu es déjà dans le mode édition"
+  edit:
+    open: "%prefix% &6Tu rentres dans le mode édition"
+    close: "%prefix% &6Tu sors du mode édition"

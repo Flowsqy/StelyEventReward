@@ -39,17 +39,15 @@ public class SetSessionManager implements Listener {
     // Session manipulation
 
     public void open(Player player) {
-        if (!sessions.containsKey(player.getUniqueId())) {
-            final MoveProtectionTask moveProtectionTask = new MoveProtectionTask(player);
-            sessions.put(player.getUniqueId(), new SetSession(
-                    player.getInventory().getContents(),
-                    player.getGameMode(),
-                    moveProtectionTask)
-            );
-            player.getInventory().clear();
-            player.setGameMode(GameMode.CREATIVE);
-            moveProtectionTask.start();
-        }
+        final MoveProtectionTask moveProtectionTask = new MoveProtectionTask(player);
+        sessions.put(player.getUniqueId(), new SetSession(
+                player.getInventory().getContents(),
+                player.getGameMode(),
+                moveProtectionTask)
+        );
+        player.getInventory().clear();
+        player.setGameMode(GameMode.CREATIVE);
+        moveProtectionTask.start();
     }
 
     public boolean close(Player player, Consumer<SetSession> closeCallback) {
