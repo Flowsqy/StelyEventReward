@@ -68,6 +68,11 @@ public class SetRewardCommandHandler implements TabExecutor {
     }
 
     private void editExecutor(Player player, String[] args) {
+        if (setSessionManager.open(player)) {
+            messages.sendMessage(player, "setreward.edit");
+        } else {
+            messages.sendMessage(player, "setreward.alreadyedit");
+        }
     }
 
     private void saveExecutor(Player player, String[] args) {

@@ -26,14 +26,21 @@ public class SetSessionManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public boolean toggle(Player player) {
-        if (!sessions.containsKey(player.getUniqueId())) {
+    public boolean open(Player player) {
+        final boolean inSession = sessions.containsKey(player.getUniqueId());
+        if (!inSession) {
             sessions.put(player.getUniqueId(), player.getInventory().getContents());
             player.getInventory().clear();
-            return false;
         }
-        // TODO Store changes
-        resetPlayer(player);
+        return !inSession;
+    }
+
+    public boolean close(Player player, String event, String ranking) {
+        final ItemStack[] originalContent = sessions.remove(player.getUniqueId());
+        if (originalContent == null)
+            return false;
+        // TODO Save in a config
+        resetInventory(player, originalContent);
         return true;
     }
 
@@ -47,10 +54,6 @@ public class SetSessionManager implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onDisconnect(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
-        resetPlayer(player);
-    }
-
-    private void resetPlayer(Player player) {
         final ItemStack[] originalContent = sessions.remove(player.getUniqueId());
         resetInventory(player, originalContent);
     }
