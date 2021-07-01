@@ -2,6 +2,7 @@ package fr.flowsqy.stelyeventreward.inventory;
 
 import fr.flowsqy.stelyeventreward.StelyEventRewardPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 public class SetSessionManager implements Listener {
 
-    private final Map<UUID, ItemStack[]> sessions;
+    private final Map<UUID, SetSession> sessions;
     private final File rewardFolder;
 
     public SetSessionManager(StelyEventRewardPlugin plugin, File pluginDataFolder) {
@@ -29,23 +30,24 @@ public class SetSessionManager implements Listener {
     public boolean open(Player player) {
         final boolean inSession = sessions.containsKey(player.getUniqueId());
         if (!inSession) {
-            sessions.put(player.getUniqueId(), player.getInventory().getContents());
+            sessions.put(player.getUniqueId(), new SetSession(player.getInventory().getContents(), player.getGameMode()));
             player.getInventory().clear();
+            player.setGameMode(GameMode.CREATIVE);
         }
         return !inSession;
     }
 
     public boolean close(Player player, String event, String ranking) {
-        final ItemStack[] originalContent = sessions.remove(player.getUniqueId());
-        if (originalContent == null)
+        final SetSession session = sessions.remove(player.getUniqueId());
+        if (session == null)
             return false;
         // TODO Save in a config
-        resetInventory(player, originalContent);
+        resetInventory(player, session);
         return true;
     }
 
     public void resetAll() {
-        for (Map.Entry<UUID, ItemStack[]> entry : sessions.entrySet()) {
+        for (Map.Entry<UUID, SetSession> entry : sessions.entrySet()) {
             resetInventory(Bukkit.getPlayer(entry.getKey()), entry.getValue());
         }
         sessions.clear();
@@ -54,16 +56,20 @@ public class SetSessionManager implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onDisconnect(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
-        final ItemStack[] originalContent = sessions.remove(player.getUniqueId());
-        resetInventory(player, originalContent);
+        final SetSession session = sessions.remove(player.getUniqueId());
+        resetInventory(player, session);
     }
 
-    private void resetInventory(Player player, ItemStack[] originalContent) {
-        if (originalContent == null)
+    private void resetInventory(Player player, SetSession session) {
+        if (session == null)
             return;
         final PlayerInventory inventory = player.getInventory();
         inventory.clear();
-        inventory.setContents(originalContent);
+        inventory.setContents(session.originalContent());
+        player.setGameMode(session.previousGameMode());
+    }
+
+    private final record SetSession(ItemStack[] originalContent, GameMode previousGameMode) {
     }
 
 }
