@@ -4,6 +4,7 @@ import fr.flowsqy.stelyeventreward.StelyEventRewardPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -90,30 +91,26 @@ public class SetSessionManager implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerInteract(PlayerInteractEvent event) {
-        if (fastCheckPlayer(event.getPlayer().getUniqueId()))
-            event.setCancelled(true);
+        final Player player = event.getPlayer();
+        if (fastCheckPlayer(player.getUniqueId())) {
+            if (event.getMaterial() == Material.ANVIL) {
+                // Open an anvil inventory, but it's annoying
+            } else {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerClickInventory(InventoryClickEvent event) {
-        if (
-                (
-                        event.getView().getType() != InventoryType.CREATIVE
-                                || event.getView().getType() != InventoryType.PLAYER
-                )
-                        && fastCheckPlayer(event.getWhoClicked().getUniqueId())) {
+        if (event.getInventory().getType() == InventoryType.ENDER_CHEST && fastCheckPlayer(event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerDragInventory(InventoryDragEvent event) {
-        if (
-                (
-                        event.getView().getType() != InventoryType.CREATIVE
-                                || event.getView().getType() != InventoryType.PLAYER
-                )
-                        && fastCheckPlayer(event.getWhoClicked().getUniqueId())) {
+        if (event.getInventory().getType() == InventoryType.ENDER_CHEST && fastCheckPlayer(event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
         }
     }
@@ -151,9 +148,18 @@ public class SetSessionManager implements Listener {
 
         @Override
         public void run() {
-            if (!originalLocation.equals(player.getLocation())) {
+            if (!compare(originalLocation, player.getLocation())) {
+                originalLocation.setYaw(player.getLocation().getYaw());
+                originalLocation.setPitch(player.getLocation().getPitch());
                 player.teleport(originalLocation, PlayerTeleportEvent.TeleportCause.UNKNOWN);
             }
+        }
+
+        private boolean compare(Location first, Location second) {
+            return
+                    first.getBlockX() == second.getBlockX()
+                            && first.getBlockY() == second.getBlockY()
+                            && first.getBlockZ() == second.getBlockZ();
         }
 
         public void start() {
