@@ -34,37 +34,40 @@ public class SetRewardCommandHandler implements TabExecutor {
         subCommands[0] = new SubCommand(
                 "help",
                 "h",
+                -1,
                 this::helpExecutor,
                 (player, args) -> Collections.emptyList()
         );
         subCommands[1] = new SubCommand(
                 "edit",
                 "e",
+                0,
                 this::editExecutor,
                 (player, args) -> Collections.emptyList()
         );
         subCommands[2] = new SubCommand(
                 "save",
                 "s",
+                2,
                 this::saveExecutor,
                 (player, args) -> Collections.emptyList()
         );
         subCommands[3] = new SubCommand(
                 "message",
                 "m",
+                -1,
                 this::messageExecutor,
                 this::messageTabCompleter
         );
     }
 
     private void helpExecutor(Player player, String[] args) {
-        for(SubCommand subCommand : subCommands){
+        for (SubCommand subCommand : subCommands) {
             messages.sendMessage(player, subCommand.getHelpPath());
         }
     }
 
     private void editExecutor(Player player, String[] args) {
-
     }
 
     private void saveExecutor(Player player, String[] args) {
@@ -94,6 +97,11 @@ public class SetRewardCommandHandler implements TabExecutor {
             subCommand = optionalSubCommand.orElseGet(() -> subCommands[0]);
         } else {
             subCommand = subCommands[0];
+        }
+
+        if (subCommand.argCount > -1 && subCommand.argCount != args.length) {
+            messages.sendMessage(player, subCommand.getHelpPath());
+            return true;
         }
 
         subCommand.executor().accept(player, args);
@@ -129,6 +137,7 @@ public class SetRewardCommandHandler implements TabExecutor {
     private final record SubCommand(
             String name,
             String alias,
+            int argCount,
             BiConsumer<Player, String[]> executor,
             BiFunction<Player, String[], List<String>> tabCompleter
     ) {
